@@ -1,0 +1,197 @@
+openapi: 3.0.3
+info:
+  title: Payment Initiation API
+  version: 1.0.0
+  description: API for PaymentOrder (contract aligned with test sample)
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /payment-initiation/payment-orders:
+    post:
+      summary: Create a payment order
+      operationId: createPaymentOrder
+      tags: [ PaymentOrders ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentOrderRequest'
+            example:
+              externalReference: "EXT-1"
+              debtorAccount:
+                iban: "EC12DEBTOR"
+              creditorAccount:
+                iban: "EC98CREDITOR"
+              instructedAmount:
+                amount: 150.75
+                currency: "USD"
+              remittanceInformation: "Factura 001-123"
+              requestedExecutionDate: "2025-10-31"
+      responses:
+        '201':
+          description: Payment order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrderResponse'
+        '400':
+          description: Invalid request
+
+  /payment-initiation/payment-orders/{paymentOrderId}:
+    get:
+      summary: Get payment order by ID
+      operationId: getPaymentOrder
+      tags: [ PaymentOrders ]
+      parameters:
+        - name: paymentOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: PO-0001
+      responses:
+        '200':
+          description: Payment order retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentOrderResponse'
+              examples:
+                example-1:
+                  value:
+                    id: "PO-0001"
+                    externalReference: "EXT-1"
+                    debtorAccount:
+                      iban: "EC12DEBTOR"
+                    creditorAccount:
+                      iban: "EC98CREDITOR"
+                    instructedAmount:
+                      amount: 150.75
+                      currency: "USD"
+                    remittanceInformation: "Factura 001-123"
+                    requestedExecutionDate: "2025-10-31"
+                    status: "PENDING"
+                    createdAt: "2025-11-21T03:00:00Z"
+        '404':
+          description: Not found
+
+  /payment-initiation/payment-orders/{paymentOrderId}/status:
+    get:
+      summary: Get payment order status
+      operationId: getPaymentOrderStatus
+      tags: [ PaymentOrders ]
+      parameters:
+        - name: paymentOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: PO-0001
+      responses:
+        '200':
+          description: Payment order status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatusResponse'
+              examples:
+                pending:
+                  value:
+                    id: "PO-0001"
+                    status: "PENDING"
+                    lastUpdated: "2025-11-21T03:00:00Z"
+        '404':
+          description: Not found
+
+components:
+  schemas:
+    DebtorAccount:
+      type: object
+      required: [ iban ]
+      properties:
+        iban:
+          type: string
+          example: "EC12DEBTOR"
+
+    CreditorAccount:
+      type: object
+      required: [ iban ]
+      properties:
+        iban:
+          type: string
+          example: "EC98CREDITOR"
+
+    InstructedAmount:
+      type: object
+      required: [ amount, currency ]
+      properties:
+        amount:
+          type: number
+          format: double
+          example: 150.75
+        currency:
+          type: string
+          example: "USD"
+
+    PaymentOrderRequest:
+      type: object
+      required: [ externalReference, debtorAccount, creditorAccount, instructedAmount, requestedExecutionDate ]
+      properties:
+        externalReference:
+          type: string
+          example: "EXT-1"
+        debtorAccount:
+          $ref: '#/components/schemas/DebtorAccount'
+        creditorAccount:
+          $ref: '#/components/schemas/CreditorAccount'
+        instructedAmount:
+          $ref: '#/components/schemas/InstructedAmount'
+        remittanceInformation:
+          type: string
+          example: "Factura 001-123"
+        requestedExecutionDate:
+          type: string
+          format: date
+          example: "2025-10-31"
+
+    PaymentOrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "PO-0001"
+        externalReference:
+          type: string
+          example: "EXT-1"
+        debtorAccount:
+          $ref: '#/components/schemas/DebtorAccount'
+        creditorAccount:
+          $ref: '#/components/schemas/CreditorAccount'
+        instructedAmount:
+          $ref: '#/components/schemas/InstructedAmount'
+        remittanceInformation:
+          type: string
+        requestedExecutionDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [ PENDING, PROCESSING, COMPLETED, FAILED ]
+        createdAt:
+          type: string
+          format: date-time
+
+    PaymentStatusResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [ PENDING, PROCESSING, COMPLETED, FAILED ]
+        lastUpdated:
+          type: string
+          format: date-time
