@@ -9,9 +9,23 @@ Java 17+
 
 Maven 3.8+
 
-Docker y Docker Compose
+Docker y Docker Compose:
+Este proyecto incluye un archivo docker-compose.yml que levanta un contenedor de PostgreSQL 15.
 
-PostgreSQL (opcional si no quieres usar Docker)
+Archivo Openapi.yaml:
+El proyecto incluye un archivo openapi/openapi.yaml que define todo el contrato de la API Payment Initiation, utilizando OpenAPI 3.0.3.
+
+✨ Características principales del contrato:
+
+-Creación de órdenes de pago
+
+-Consulta de una orden por su ID
+
+-Consulta del estado de una orden
+
+-Esquemas definidos para todas las entidades (Request y Response)
+
+-Ejemplos incluidos para facilitar pruebas
 
 ✅ 1. Levantar la base de datos PostgreSQL con Docker
 
@@ -19,11 +33,9 @@ Ubícate en el directorio raiz del proyecto una vez descargado del repositorio d
 
 cd C:\tu_ruta\payment-initiation
 
-
 Levanta el contenedor (teenr docker desktop encendido):
 
 docker compose up -d
-
 
 Verifica que PostgreSQL esté corriendo:
 
